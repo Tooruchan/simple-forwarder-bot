@@ -1,6 +1,6 @@
 # Telegram Simple Forwarder Bot
-##一个简单的用于频道投稿与方便+86用户私聊的Telegram机器人
-###怎么部署<br>
+一个简单的用于频道投稿与方便+86用户私聊的Telegram机器人
+##怎么部署
 1. 在 [@botfather](https://t.me/botfather) 处申请一个bot的API Token
 2. 在服务器上执行下列命令（请先安装git)
 ```
