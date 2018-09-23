@@ -10,7 +10,7 @@ pip3 install telebot
 ```
 3. 打开config.json,将其中的Token字符串内容修改为你从BotFather获取到的Token,在admin这个list里加入你的id(即用@userinfobot等bot获取到的id)
 4. 使用 `python3 bot.py` 运行bot
-5. 打开你在BotFather申请到的bot的聊天界面（需要使用一次/start）
+5. 打开你在BotFather申请到的bot的聊天界面（需要使用一次/start，否则会报错）
 
 ## 使用开源协议
 MIT
