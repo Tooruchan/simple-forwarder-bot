@@ -59,7 +59,7 @@ while(1):
                     with open('./config.json','w+') as write_config:
                         now_config = dict(blacklist=blacklist,admin=admin,token=token)
                         json.dump(now_config,write_config)
-                        now_config.close()
+                        write_config.close()
                         bot.reply_to(message,'已经将用户'+user_id+'加入本机器人的黑名单中。')
             else:
                 pass
@@ -79,7 +79,7 @@ while(1):
                     with open('./config.json','w+') as write_config:
                         now_config = dict(blacklist=blacklist,admin=admin,token=token)
                         json.dump(now_config,write_config)
-                        now_config.close()
+                        write_config.close()
                         bot.reply_to(message+'已经将用户'+user_id+'从黑名单中删去')   
             else:
                 pass        
