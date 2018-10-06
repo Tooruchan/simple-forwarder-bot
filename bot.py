@@ -38,7 +38,11 @@ while(1):
 
         @bot.message_handler(commands = ['info'])
         def show_info(message):
-            if message.chat.username is None:
+            if message.chat.username is None and message.chat.last_name is None:
+                bot.reply_to(message,'您的名字:'+message.chat.first_name+'\n您的ID:'+str(message.chat.id))
+            elif message.chat.last_name is None:
+                bot.reply_to(message,'您的username: @' + message.chat.username + '\n您的名字:'+message.chat.first_name+'\n您的ID:'+str(message.chat.id))
+            elif message.chat.username is None:
                 bot.reply_to(message,'您的名字:'+message.chat.first_name+'\n您的姓氏:'+message.chat.last_name+'\n您的ID:'+str(message.chat.id))
             else:
                 bot.reply_to(message,'您的username: @'+message.chat.username+'\n您的名字:'+message.chat.first_name+'\n您的姓氏:'+message.chat.last_name+'\n您的ID:'+str(message.chat.id))
@@ -59,7 +63,7 @@ while(1):
                     with open('./config.json','w+') as write_config:
                         now_config = dict(blacklist=blacklist,admin=admin,token=token)
                         json.dump(now_config,write_config)
-                        write_config.close()
+                        now_config.close()
                         bot.reply_to(message,'已经将用户'+user_id+'加入本机器人的黑名单中。')
             else:
                 pass
@@ -79,7 +83,7 @@ while(1):
                     with open('./config.json','w+') as write_config:
                         now_config = dict(blacklist=blacklist,admin=admin,token=token)
                         json.dump(now_config,write_config)
-                        write_config.close()
+                        now_config.close()
                         bot.reply_to(message+'已经将用户'+user_id+'从黑名单中删去')   
             else:
                 pass        
@@ -96,7 +100,7 @@ while(1):
                     bot.reply_to(message,'消息已经成功被转发。')
             else:
                 pass
-        @bot.message_handler(content_types=['text','audio','photo','sticker'])
+        @bot.message_handler(content_types=['text','audio','photo','sticker','document','video','video_note','voice'])
         def check(message):
             if message.chat.type in ['group','channel','supergroup']:
                 pass
