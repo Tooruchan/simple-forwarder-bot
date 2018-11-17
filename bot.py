@@ -130,9 +130,9 @@ try:
                     chat_id = user_id
                     bot.send_message(
                         int(user_id), '管理员已切换会话至您。', parse_mode='Markdown')
-                    bot.reply_to(message, '切换会话成功,当前会话为:ID:`' + str(message.chat.id) + '`\n [' +
+                    bot.reply_to(message, '切换会话成功,当前会话为:ID:`' + str(chat_id) + '`\n [' +
                             message.chat.first_name + '](tg://user?id=' + str(
-                                message.chat.id) + ')\n', parse_mode='Markdown')
+                                chat_id) + ')\n', parse_mode='Markdown')
                 
         else:
             pass
