@@ -122,7 +122,7 @@ try:
             try:
                 user_id = message.text.split()[1]
             except IndexError:
-                bot.reply_to(message, '消息格式错误，\n指令用法:/reply [要切换到的会话用户ID]')
+                bot.reply_to(message, '消息格式错误，\n 指令用法:/reply [要切换到的会话用户ID]')
             else:
                 if user_id == chat_id:
                     pass
@@ -130,8 +130,7 @@ try:
                     chat_id = user_id
                     bot.send_message(
                         int(user_id), '管理员已切换会话至您。', parse_mode='Markdown')
-                    bot.reply_to(message, '切换会话成功,当前会话为:ID:`' + str(chat_id) + '`\n [' +
-                            message.chat.first_name + '](tg://user?id=' + str(
+                    bot.reply_to(message, '切换会话成功,当前会话为:ID:[' + str(chat_id) + '](tg://user?id=' + str(
                                 chat_id) + ')\n', parse_mode='Markdown')
                 
         else:
@@ -185,7 +184,7 @@ try:
                                             message.message_id)
                     bot.reply_to(message, '这条消息已经成功被转发了。')
                     # print(str(message.text))
-    bot.polling(non_stop=True)
+    bot.polling()
 except KeyboardInterrupt:
     quit()
 except Exception as e:
