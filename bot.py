@@ -5,6 +5,9 @@ from telebot import types
 import json
 import os
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+import sys
+import codecs
+sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
 if os.path.exists('./config.json'):
     if os.path.getsize('./config.json'):
         pass
@@ -190,3 +193,4 @@ except KeyboardInterrupt:
     quit()
 except Exception as e:
     print(str(e))
+    
