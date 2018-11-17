@@ -141,6 +141,7 @@ try:
         global chat_id
         if message.chat.id in admin:
             if chat_id:
+                bot.send_message(int(chat_id),'管理员已经断开与您的回话。')
                 chat_id = ''
                 bot.reply_to(message,'已退出当前会话。')
             else:
@@ -173,18 +174,18 @@ try:
                             parse_mode='Markdown')
                     else:
                         bot.send_message(message.chat.id,'管理员当前正在会话中，请等待管理员看到您的消息。')
-                    for i in range(0, len(admin)):
-                        bot.send_message(
-                            admin[i],
-                            '消息来自:ID:`' + str(message.chat.id) + '`\n [' +
-                            message.chat.first_name + '](tg://user?id=' + str(
-                                message.chat.id) + ')\n' + '/reply',
-                            parse_mode='Markdown')
+                        for i in range(0, len(admin)):
+                            bot.send_message(
+                                admin[i],
+                                '消息来自:ID:`' + str(message.chat.id) + '`\n [' +
+                                message.chat.first_name + '](tg://user?id=' + str(
+                                    message.chat.id) + ')\n' + '/reply',
+                                parse_mode='Markdown')
                         bot.forward_message(admin[i], message.chat.id,
                                             message.message_id)
                     bot.reply_to(message, '这条消息已经成功被转发了。')
                     # print(str(message.text))
-    bot.polling()
+    bot.polling(none_stop=True)
 except KeyboardInterrupt:
     quit()
 except Exception as e:
