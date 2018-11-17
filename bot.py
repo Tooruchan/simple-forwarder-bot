@@ -164,6 +164,7 @@ try:
                         bot.send_message(message.chat.id,'当前并没有会话，不如用 /reply 命令手动切换一个？')
                     else:
                         bot.send_message(int(chat_id),'回复:\n'+message.text)
+                        bot.send_message(message.chat.id,'回复成功')
                 else:
                     if not chat_id:
                         bot.send_message(message.chat.id,'管理员当前并没有会话，正在为您切换...')
