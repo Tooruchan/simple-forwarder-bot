@@ -181,9 +181,9 @@ try:
                                 message.chat.first_name + '](tg://user?id=' + str(
                                     message.chat.id) + ')\n' + '/reply',
                                 parse_mode='Markdown')
-                        bot.forward_message(admin[i], message.chat.id,
-                                            message.message_id)
-                    bot.reply_to(message, '这条消息已经成功被转发了。')
+                            bot.forward_message(admin[i], message.chat.id,
+                                                message.message_id)
+                        bot.reply_to(message, '这条消息已经成功被转发了。')
                     # print(str(message.text))
     bot.polling(none_stop=True)
 except KeyboardInterrupt:
