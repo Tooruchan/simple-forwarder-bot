@@ -46,13 +46,13 @@ try:
     def welcome(message):
         bot.send_message(
             message.chat.id,
-            '这是 @tooru_chan 制作的频道投稿机器人，直接向本机器人发送你要投稿的消息即可，但是spam将会被本机器人拉进黑名单。')
+            '这是 @tooru_chan 制作的频道投稿机器人，直接向本机器人发送你要投稿的消息即可，但是spam将会被本机器人拉进黑名单。\n注意在没有提示转发成功的消息之前，管理员是看不见你的话的。')
 
     @bot.message_handler(commands=['help'])
     def help(message):
         bot.reply_to(
             message,
-            '这是 @tooru_chan 制作的频道投稿机器人，直接向本机器人发送你要投稿的消息即可，但是spam将会被本机器人拉进黑名单。')
+            '这是 @tooru_chan 制作的频道投稿机器人，直接向本机器人发送你要投稿的消息即可，但是spam将会被本机器人拉进黑名单。\n注意在没有提示转发成功的消息之前，管理员是看不见你的话的。')
 
     @bot.message_handler(commands=['info'])
     def show_info(message):
@@ -81,6 +81,10 @@ try:
                 user_id = message.text.split()[1]
                 if int(user_id) in blacklist or int(user_id) in admin:
                     raise ValueError
+                elif user_id.isdigit():
+                    pass
+                else:
+                    raise IndexError
             except IndexError:
                 bot.reply_to(message, '指令格式不正确。\n用法:/ban [用户ID]')
             except ValueError:
@@ -103,6 +107,10 @@ try:
             try:
                 user_id = message.text.split()[1]
                 id_index = blacklist.index(int(user_id))
+                if user_id.isdigit():
+                    pass
+                else:
+                    raise IndexError
             except IndexError:
                 bot.reply_to(message, '指令格式不正确。\n用法:/unban [用户ID]')
             except ValueError:
@@ -124,12 +132,18 @@ try:
         if message.chat.id in admin:
             try:
                 user_id = message.text.split()[1]
+                if user_id.isdigit():
+                    pass
+                else:
+                    raise IndexError
             except IndexError:
                 bot.reply_to(message, '消息格式错误，\n 指令用法:/reply [要切换到的会话用户ID]')
             else:
                 if user_id == chat_id:
                     pass
                 else:
+                    if chat_id:
+                        bot.send_message(int(chat_id),'管理员已经断开与您的会话。')
                     chat_id = user_id
                     bot.send_message(
                         int(user_id), '管理员已切换会话至您。', parse_mode='Markdown')
@@ -144,7 +158,7 @@ try:
         global chat_id
         if message.chat.id in admin:
             if chat_id:
-                bot.send_message(int(chat_id),'管理员已经断开与您的回话。')
+                bot.send_message(int(chat_id),'管理员已经断开与您的会话。')
                 chat_id = ''
                 bot.reply_to(message,'已退出当前会话。')
             else:
@@ -166,6 +180,8 @@ try:
                     if not chat_id:
                         bot.send_message(message.chat.id,'当前并没有会话，不如用 /reply 命令手动切换一个？')
                     else:
+                        if message.text is None:
+                            bot.send_message(message.chat.id,'请不要发送除了文本之外的内容!')
                         bot.send_message(int(chat_id),'回复:\n'+message.text)
                         bot.send_message(message.chat.id,'回复成功')
                 else:
@@ -173,10 +189,19 @@ try:
                         bot.send_message(message.chat.id,'管理员当前并没有会话，正在为您切换...')
                         chat_id = str(message.chat.id)
                         for i in range(0, len(admin)):
-                            bot.send_message(admin[i],'已连接到用户 `'+ chat_id +'` 的会话上。',
+                            bot.send_message(admin[i],'已自动连接到用户 `'+ chat_id +'` 的会话上。',
                             parse_mode='Markdown')
+                            bot.send_message(
+                                admin[i],
+                                '消息来自:ID:`' + str(message.chat.id) + '`\n [' +
+                                message.chat.first_name + '](tg://user?id=' + str(
+                                    message.chat.id) + ')\n' + '/reply',
+                                parse_mode='Markdown')
+                            bot.forward_message(admin[i], message.chat.id,
+                                                message.message_id)
+                        bot.reply_to(message, '这条消息已经成功被转发了。')
                     else:
-                        bot.send_message(message.chat.id,'管理员当前正在会话中，请等待管理员看到您的消息。')
+                        bot.send_message(message.chat.id,'管理员当前正在会话中，请等待管理员看到您的消息。在没有提示已成功转发的时候是看不见您的消息的。')
                         for i in range(0, len(admin)):
                             bot.send_message(
                                 admin[i],
