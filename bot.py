@@ -30,29 +30,87 @@ with open('./config.json', 'r+') as config_file:
     token = config['token']
 
 bot = telebot.TeleBot(token)
+
+
 def gen_markup():
     markup = InlineKeyboardMarkup()
-    markup.row_width = 3
-    markup.add(InlineKeyboardButton("投稿",callback_data=f"post"),InlineKeyboardButton("私聊",callback_data=f"message"))
+    markup.row_width = 2
+    markup.add(
+        InlineKeyboardButton("投稿", callback_data=f"post"),
+        InlineKeyboardButton("私聊", callback_data=f"message"))
     return markup
-    @bot.callback_query_handler(func=lambda call:True)
+
+    @bot.callback_query_handler(func=lambda call: True)
     def callback_query(call):
         if call_data == '投稿':
             pass
 
+
+def push_and_reply(msgid):
+    global session_id
+    session_id = str(msgid)
+    markup = InlineKeyboardMarkup()
+    markup.row_width = 2
+    markup.add(
+        InlineKeyboardButton("连接会话", callback_data=f"conn_session"),
+        InlineKeyboardButton("退出会话", callback_data=f"change"),
+        InlineKeyboardButton("拉黑", callback_data=f"addblock"))
+    return markup
+
+
 try:
     chat_id = ''
+    session_id = ''
+
+    @bot.callback_query_handler(lambda q: q.data == 'conn_session')
+    def connect_session(call):
+        global session_id,chat_id
+        if chat_id:
+            bot.answer_callback_query(call.id,
+                                        '已经连接上了用户' + str(session_id) + '的会话')
+            chat_id = session_id
+            bot.send_message(int(chat_id), '管理员已将会话切换至您。')
+        else:
+            bot.answer_callback_query(call.id)
+
+    @bot.callback_query_handler(lambda q: q.data == 'change')
+    def change_session(call):
+        global chat_id
+        if chat_id:
+            bot.answer_callback_query(
+                call.id, '已经断开了与用户 ' + str(chat_id) + ' 的会话。')
+            bot.send_message(int(chat_id), '管理员已经断开与您的会话。')
+            chat_id = ''
+        else:
+            bot.answer_callback_query(call.id)
+
+    @bot.callback_query_handler(lambda q: q.data == 'addblock')
+    def ban_user_session(call):
+        global chat_id
+        if chat_id:
+            blacklist.append(int(chat_id))
+            with open('./config.json', 'w+') as write_config:
+                now_config = dict(blacklist=blacklist, admin=admin, token=token)
+                json.dump(now_config, write_config)
+                write_config.close()
+                bot.answer_callback_query(
+                    call.id, '已经将用户 ' + str(chat_id) + ' 加入本机器人的黑名单中。')
+        else:
+            bot.answer_callback_query(call.id)
+
     @bot.message_handler(commands=['start'])
     def welcome(message):
         bot.send_message(
             message.chat.id,
-            '这是 @tooru_chan 制作的频道投稿机器人，直接向本机器人发送你要投稿的消息即可，但是spam将会被本机器人拉进黑名单。\n注意在没有提示转发成功的消息之前，管理员是看不见你的话的。')
+            '这是 @tooru_chan 制作的频道投稿机器人，直接向本机器人发送你要投稿的消息即可，但是spam将会被本机器人拉进黑名单。\n注意在没有提示转发成功的消息之前，管理员是看不见你的话的。'
+        )
 
     @bot.message_handler(commands=['help'])
     def help(message):
         bot.reply_to(
             message,
-            '这是 @tooru_chan 制作的频道投稿机器人，直接向本机器人发送你要投稿的消息即可，但是spam将会被本机器人拉进黑名单。\n注意在没有提示转发成功的消息之前，管理员是看不见你的话的。')
+            '这是 @tooru_chan 制作的频道投稿机器人，直接向本机器人发送你要投稿的消息即可，但是spam将会被本机器人拉进黑名单。\n注意在没有提示转发成功的消息之前，管理员是看不见你的话的。'
+        )
 
     @bot.message_handler(commands=['info'])
     def show_info(message):
@@ -97,7 +155,7 @@ try:
                     json.dump(now_config, write_config)
                     write_config.close()
                     bot.reply_to(message,
-                                '已经将用户 ' + str(user_id) + ' 加入本机器人的黑名单中。')
+                                 '已经将用户 ' + str(user_id) + ' 加入本机器人的黑名单中。')
         else:
             pass
 
@@ -122,7 +180,8 @@ try:
                         blacklist=blacklist, admin=admin, token=token)
                     json.dump(now_config, write_config)
                     write_config.close()
-                    bot.reply_to(message, '已经将用户 ' + str(user_id) + ' 从黑名单中删去。')
+                    bot.reply_to(message,
+                                 '已经将用户 ' + str(user_id) + ' 从黑名单中删去。')
         else:
             pass
 
@@ -143,13 +202,16 @@ try:
                     pass
                 else:
                     if chat_id:
-                        bot.send_message(int(chat_id),'管理员已经断开与您的会话。')
+                        bot.send_message(int(chat_id), '管理员已经断开与您的会话。')
                     chat_id = user_id
                     bot.send_message(
                         int(user_id), '管理员已切换会话至您。', parse_mode='Markdown')
-                    bot.reply_to(message, '切换会话成功,当前会话为:ID:[' + str(chat_id) + '](tg://user?id=' + str(
-                                chat_id) + ')\n', parse_mode='Markdown')
-                
+                    bot.reply_to(
+                        message,
+                        '切换会话成功,当前会话为:ID:[' + str(chat_id) + '](tg://user?id='
+                        + str(chat_id) + ')\n',
+                        parse_mode='Markdown')
+
         else:
             pass
 
@@ -158,11 +220,11 @@ try:
         global chat_id
         if message.chat.id in admin:
             if chat_id:
-                bot.send_message(int(chat_id),'管理员已经断开与您的会话。')
+                bot.send_message(int(chat_id), '管理员已经断开与您的会话。')
                 chat_id = ''
-                bot.reply_to(message,'已退出当前会话。')
+                bot.reply_to(message, '已退出当前会话。')
             else:
-                bot.reply_to(message,'当前并没有会话，不如用 /reply 命令手动切换一个？')
+                bot.reply_to(message, '当前并没有会话，不如用 /reply 命令手动切换一个？')
 
     @bot.message_handler(content_types=[
         'text', 'audio', 'photo', 'sticker', 'document', 'video', 'video_note',
@@ -178,44 +240,52 @@ try:
             else:
                 if message.chat.id in admin:
                     if not chat_id:
-                        bot.send_message(message.chat.id,'当前并没有会话，不如用 /reply 命令手动切换一个？')
+                        bot.send_message(message.chat.id,
+                                         '当前并没有会话，不如用 /reply 命令手动切换一个？')
                     else:
                         if message.text is None:
-                            bot.send_message(message.chat.id,'请不要发送除了文本之外的内容!')
-                        bot.send_message(int(chat_id),'回复:\n'+message.text)
-                        bot.send_message(message.chat.id,'回复成功')
+                            bot.send_message(message.chat.id,
+                                             '请不要发送除了文本之外的内容!')
+                        bot.send_message(int(chat_id), '回复:\n' + message.text)
+                        bot.send_message(message.chat.id, '回复成功')
                 else:
                     if not chat_id:
-                        bot.send_message(message.chat.id,'管理员当前并没有会话，正在为您切换...')
+                        bot.send_message(message.chat.id,
+                                         '管理员当前并没有会话，正在为您切换...')
                         chat_id = str(message.chat.id)
                         for i in range(0, len(admin)):
-                            bot.send_message(admin[i],'已自动连接到用户 `'+ chat_id +'` 的会话上。',
-                            parse_mode='Markdown')
                             bot.send_message(
                                 admin[i],
-                                '消息来自:ID:`' + str(message.chat.id) + '`\n [' +
-                                message.chat.first_name + '](tg://user?id=' + str(
-                                    message.chat.id) + ')\n' + '/reply',
+                                '已自动连接到用户 `' + chat_id + '` 的会话上。',
                                 parse_mode='Markdown')
+                            bot.send_message(
+                                admin[i],
+                                '消息来自:\nID:`' + str(message.chat.id) + '`\n ['
+                                + message.chat.first_name + '](tg://user?id=' +
+                                str(message.chat.id) + ')',
+                                parse_mode='Markdown',
+                                reply_markup=push_and_reply(message.chat.id))
                             bot.forward_message(admin[i], message.chat.id,
                                                 message.message_id)
                         bot.reply_to(message, '这条消息已经成功被转发了。')
                     else:
-                        bot.send_message(message.chat.id,'管理员当前正在会话中，请等待管理员看到您的消息。在没有提示已成功转发的时候是看不见您的消息的。')
+                        bot.send_message(
+                            message.chat.id,
+                            '管理员当前正在会话中，请等待管理员看到您的消息。在没有提示已成功转发的时候是看不见您的消息的。')
                         for i in range(0, len(admin)):
                             bot.send_message(
                                 admin[i],
                                 '消息来自:ID:`' + str(message.chat.id) + '`\n [' +
-                                message.chat.first_name + '](tg://user?id=' + str(
-                                    message.chat.id) + ')\n' + '/reply',
+                                message.chat.first_name + '](tg://user?id=' +
+                                str(message.chat.id) + ')\n' + '/reply',
                                 parse_mode='Markdown')
                             bot.forward_message(admin[i], message.chat.id,
                                                 message.message_id)
                         bot.reply_to(message, '这条消息已经成功被转发了。')
                     # print(str(message.text))
-    bot.polling(none_stop=True)
+
+    bot.polling(none_stop=True, timeout=1919810)
 except KeyboardInterrupt:
     quit()
 except Exception as e:
     print(str(e))
-    
