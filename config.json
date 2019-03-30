@@ -1,9 +1,5 @@
 {
-    "blacklist": [
-        0
-    ],
-    "admin": [
-        0
-    ],
-    "token": "Please place your bot token here."
+    "token":"",
+    "admin": 0,
+    "Blacklist":[]
 }
