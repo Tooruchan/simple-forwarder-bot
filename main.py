@@ -47,7 +47,7 @@ def change_session(user):
 def change_session_id(user):
     return [[
         InlineKeyboardButton(
-            '切换会话至' + str(user), callback_data='csession_' + str(user))
+            '切换会话', callback_data='csession_' + str(user))
     ]]
 
 
@@ -72,8 +72,12 @@ def read_text_message(bot, update):
         elif session:
             reply_to = int(session)
         bot.forward_message(reply_to, user, msg.message_id)
-        bot.send_message(
-            user, '回复至`' + session + '`成功。', parse_mode='Markdown')
+        if msg.reply_to_message:
+            bot.send_message(
+                user, '回复成功。', parse_mode='Markdown')
+        else:
+            bot.send_message(
+                user, '回复至`' + session + '`成功。', parse_mode='Markdown')
     else:
         msg_fwded = bot.forward_message(admin, chat, msg.message_id)
         bot.send_message(user, '发送成功。', reply_to_message=msg.message_id)
@@ -110,7 +114,10 @@ def answer_session(bot, update):
             parse_mode='Markdown',
             reply_markup=InlineKeyboardMarkup(disconnect(session)))
     elif data == 'disconnect':
-        bot.answer_callback_query(callback_id, '已经断开用户ID号:' + session + '的会话')
+        try:
+            bot.answer_callback_query(callback_id, '已经断开用户ID号:' + session + '的会话')
+        except:
+            bot.answer_callback_query(callback_id)
         bot.edit_message_text(
             '消息来自开启了转发策略的用户:\n`' + str(session) + '`',
             chat,
