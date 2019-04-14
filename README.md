@@ -8,7 +8,7 @@ git clone https://github.com/Tooruchan/simple-forwarder-bot
 pip install python-telegram-bot --upgrade
 ```
 3. 打开config.json,将其中的Token字符串内容修改为你从BotFather获取到的Token,在admin里填入你的id(即用 [@userinfobot](https://t.me/userinfobot) 等bot获取到的id)
-4. 使用 `python3 bot.py` 运行bot  
+4. 使用 `python3 main.py` 运行bot  
 ** 切记，必须使用 Python 3 运行，否则一定报错。 **
 5. 使用即可
 
